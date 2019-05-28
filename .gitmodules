@@ -1,0 +1,3 @@
+[submodule "galeb"]
+	path = galeb
+	url = https://github.com/galeb/galeb.git
