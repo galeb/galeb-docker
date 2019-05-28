@@ -30,7 +30,7 @@ su -l -s /bin/bash galeb <<EOF
   -DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector \
   ${JAVA_VMS} \
   ${JAVA_VMX} \
-  -jar /mnt/target/galeb-${SERVICO}-${VERSION}-SNAPSHOT.jar
+  -jar /mnt/target/galeb-${SERVICE}-${VERSION}-SNAPSHOT.jar
 EOF
 
 #EOF
