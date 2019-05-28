@@ -9,11 +9,11 @@ setup:
 	git submodule update --remote --recursive
 
 common: clean
-	GALEB_VERSION=${GALEB_VERSION} ./mvnw -f galeb/core/pom/xml install -DskipTests
-	GALEB_VERSION=${GALEB_VERSION} ./mvnw -f galeb/newcore/pom/xml install -DskipTests
+	GALEB_VERSION=${GALEB_VERSION} ./mvnw -f galeb/core/pom.xml install -DskipTests
+	GALEB_VERSION=${GALEB_VERSION} ./mvnw -f galeb/newcore/pom.xml install -DskipTests
 
 package: common
-	GALEB_VERSION=${GALEB_VERSION} ./mvnw -f galeb.pom.xml package -DskipTests
+	GALEB_VERSION=${GALEB_VERSION} ./mvnw -f galeb/pom.xml package -DskipTests
 
 test: clean
 	GALEB_VERSION=${GALEB_VERSION} ./mvnw -f galeb/pom.xml test
