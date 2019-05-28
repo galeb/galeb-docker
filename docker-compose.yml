@@ -1,0 +1,157 @@
+version: '3'
+
+services:
+
+  router:
+    image: tuxmonteiro/ucentos:7
+    env_file:
+      - apikey/router.env
+    ports:
+      - "8000:8080"
+    depends_on:
+      - legba
+    networks:
+      - public
+      - private
+    volumes:
+      - ./galeb/router:/mnt
+      - ./jdk:/mnt/jdk
+      - ./log4j2.xml:/mnt/log4j2.xml
+      - ./userdata/router.sh:/mnt/start.sh
+    command: ["/mnt/start.sh","4.0.0"]
+
+  legba:
+    image: tuxmonteiro/ucentos:7
+    env_file:
+      - apikey/legba.env
+    ports:
+      - "8001:8080"
+    depends_on:
+      - redis
+      - mysql
+    networks:
+      - public
+      - private
+    volumes:
+      - ./galeb/legba:/mnt
+      - ./jdk:/mnt/jdk
+      - ./log4j2.xml:/mnt/log4j2.xml
+      - ./userdata/manager.sh:/mnt/start.sh
+    command: ["/mnt/start.sh","legba","4.0.0"]
+
+  kratos:
+    image: tuxmonteiro/ucentos:7
+    env_file:
+      - apikey/kratos.env
+    ports:
+      - "8002:8080"
+    depends_on:
+      - redis
+      - artemis
+      - mysql
+    networks:
+      - public
+      - private
+    volumes:
+      - ./galeb/kratos:/mnt
+      - ./jdk:/mnt/jdk
+      - ./log4j2.xml:/mnt/log4j2.xml
+      - ./userdata/manager.sh:/mnt/start.sh
+    command: ["/mnt/start.sh","kratos","4.0.0"]
+
+  healthchecker:
+    image: tuxmonteiro/ucentos:7
+    env_file:
+      - apikey/healthchecker.env
+    ports:
+      - "8003:8080"
+    depends_on:
+      - kratos
+      - artemis
+    networks:
+      - public
+      - private
+    volumes:
+      - ./galeb/health:/mnt
+      - ./jdk:/mnt/jdk
+      - ./log4j2.xml:/mnt/log4j2.xml
+      - ./userdata/manager.sh:/mnt/start.sh
+    command: ["/mnt/start.sh","health","4.0.0"]
+
+  api:
+    image: tuxmonteiro/ucentos:7
+    env_file:
+      - apikey/router.env
+    ports:
+      - "8000:8080"
+    depends_on:
+      - mysql
+    networks:
+      - public
+      - private
+    volumes:
+      - ./galeb/router:/mnt
+      - ./jdk:/mnt/jdk
+      - ./log4j2.xml:/mnt/log4j2.xml
+      - ./userdata/api.sh:/mnt/start.sh
+    command: ["/mnt/start.sh","4.0.0"]
+
+
+### External Services
+
+  mysql:
+    image: mysql:5.6
+    env_file:
+      - apikey/mysql.env
+    networks:
+      - private
+    volumes:
+      - mysql-volume:/var/lib/mysql
+    dns_search: .
+
+  artemis:
+    image: vromero/activemq-artemis:1.5.4
+    container_name: broker
+    ports:
+      - "61616:61616"
+      - "8161:8161"
+    env_file:
+      - apikey/artemis.env
+    networks:
+      - private
+    dns_search: .
+
+  redis:
+    image: redis:4.0
+    env_file:
+      - apikey/redis.env
+    networks:
+      - private
+    volumes:
+      - redis-volume:/data
+    dns_search: .
+    command: [
+      "bash", "-c",
+      '
+       docker-entrypoint.sh
+       --requirepass "$$REDIS_PASSWORD"
+      '
+    ]
+
+  ldap:
+    image: tuxmonteiro/ldap-mock:latest
+    container_name: ldap
+    volumes:
+      - "./apikey/users.json:/usr/src/app/users/users.json"
+    ports:
+      - 3890:3890
+
+volumes:
+  mysql-volume:
+  redis-volume:
+
+networks:
+  public:
+    driver: bridge
+  private:
+    driver: bridge
