@@ -1,3 +1,4 @@
 [submodule "galeb"]
 	path = galeb
+  branch = java11
 	url = https://github.com/galeb/galeb.git
