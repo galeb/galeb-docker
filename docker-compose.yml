@@ -83,7 +83,7 @@ services:
     env_file:
       - apikey/router.env
     ports:
-      - "8000:8080"
+      - "8004:8080"
     depends_on:
       - mysql
     networks:
