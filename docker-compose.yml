@@ -111,7 +111,6 @@ services:
 
   artemis:
     image: vromero/activemq-artemis:1.5.4
-    container_name: broker
     ports:
       - "61616:61616"
       - "8161:8161"
